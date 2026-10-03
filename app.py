@@ -24,11 +24,12 @@ DAILY_RATES = {
 PARCEL_FEE = 40
 
 st.set_page_config(
-    page_title="HFCC Food Coupon System",
+    page_title="HFCC Food Coupon Portal",
     page_icon="🌸",
     layout="wide"
 )
 
+# Responsive UI Style
 st.markdown("""
     <style>
     .main { background-color: #f8f9fa; }
@@ -37,13 +38,15 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 def get_sheet_connections():
-    # Streamlit native secret dictionary format (Zero JSON parse error risk)
+    # Robust parsing logic for Streamlit secrets
     if "gcp_service_account" in st.secrets:
         creds_dict = dict(st.secrets["gcp_service_account"])
+        if "private_key" in creds_dict:
+            creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
     else:
         creds_json = st.secrets["GCP_SERVICE_ACCOUNT"]
         creds_dict = json.loads(creds_json)
-        
+
     master_sheet_id = st.secrets["MASTER_SHEET_ID"]
     log_sheet_id = st.secrets["LOG_SHEET_ID"]
     master_tab = st.secrets.get("MASTER_TAB_NAME", "Subscription")
@@ -69,7 +72,7 @@ with tab1:
     with col1:
         block_input = st.text_input("BLOCK Name", placeholder="e.g. A")
     with col2:
-        flat_input = st.text_input("FLAT Number", placeholder="e.g. 1003")
+        flat_input = st.text_input("FLAT Number", placeholder="e.g. 1008")
         
     if st.button("Search Master Record", type="primary"):
         if not block_input or not flat_input:
