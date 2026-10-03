@@ -37,13 +37,18 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 def get_sheet_connections():
-    creds_json = st.secrets["GCP_SERVICE_ACCOUNT"]
+    # Streamlit native secret dictionary format (Zero JSON parse error risk)
+    if "gcp_service_account" in st.secrets:
+        creds_dict = dict(st.secrets["gcp_service_account"])
+    else:
+        creds_json = st.secrets["GCP_SERVICE_ACCOUNT"]
+        creds_dict = json.loads(creds_json)
+        
     master_sheet_id = st.secrets["MASTER_SHEET_ID"]
     log_sheet_id = st.secrets["LOG_SHEET_ID"]
     master_tab = st.secrets.get("MASTER_TAB_NAME", "Subscription")
     log_tab = st.secrets.get("LOG_TAB_NAME", "DistributionLogs")
     
-    creds_dict = json.loads(creds_json)
     creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
     client = gspread.authorize(creds)
     
